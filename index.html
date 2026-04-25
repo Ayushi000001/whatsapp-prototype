@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>WhatsApp Final</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    display: flex;
+    height: 100vh;
+}
+
+/* DARK MODE */
+.dark {
+    background: #1e1e1e;
+    color: white;
+}
+
+/* SIDEBAR */
+#sidebar {
+    width: 30%;
+    background: #f0f0f0;
+    border-right: 1px solid #ccc;
+}
+
+.dark #sidebar { background: #2a2a2a; }
+
+.chat-item {
+    padding: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+}
+
+/* CHAT AREA */
+#chatArea {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background: #075e54;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* CHATBOX */
+#chatbox {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background: #ece5dd;
+}
+
+.dark #chatbox { background: #121212; }
+
+.message {
+    max-width: 60%;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.sent {
+    background: #dcf8c6;
+    margin-left: auto;
+}
+
+.received {
+    background: white;
+}
+
+/* TIMESTAMP */
+.time {
+    font-size: 10px;
+    display: block;
+    margin-top: 3px;
+}
+
+/* INPUT */
+#inputArea {
+    display: flex;
+    padding: 10px;
+    background: #f0f0f0;
+}
+
+#msgInput {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+button {
+    margin-left: 10px;
+    padding: 10px;
+    background: #075e54;
+    color: white;
+    border: none;
+    border-radius: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="sidebar">
+    <div class="chat-item" onclick="openChat('Ayushi')">👩 Ayushi</div>
+    <div class="chat-item" onclick="openChat('Friend')">👨 Friend</div>
+    <div class="chat-item" onclick="openChat('Office')">💼 Office</div>
+</div>
+
+<div id="chatArea">
+    <header>
+        <span id="chatHeader">Select Chat</span>
+        <button onclick="toggleDark()">🌙</button>
+    </header>
+
+    <div id="chatbox"></div>
+
+    <div id="inputArea">
+        <input id="msgInput" placeholder="Type message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+let currentChat = "";
+
+function openChat(name) {
+    currentChat = name;
+    document.getElementById("chatHeader").innerText = name;
+
+    let saved = localStorage.getItem(name);
+    document.getElementById("chatbox").innerHTML = saved ? saved : "";
+}
+
+function getTime() {
+    let d = new Date();
+    return d.getHours() + ":" + d.getMinutes();
+}
+
+function sendMessage() {
+    let input = document.getElementById("msgInput");
+    let text = input.value;
+
+    if(text.trim() === "") return;
+
+    let chatbox = document.getElementById("chatbox");
+
+    let msg = document.createElement("div");
+    msg.className = "message sent";
+    msg.innerHTML = text + "<span class='time'>" + getTime() + "</span>";
+
+    chatbox.appendChild(msg);
+    input.value = "";
+
+    saveChat();
+
+    // typing indicator
+    let typing = document.createElement("div");
+    typing.className = "message received";
+    typing.innerText = "Typing...";
+    chatbox.appendChild(typing);
+
+    setTimeout(() => {
+        typing.remove();
+
+        let reply = document.createElement("div");
+        reply.className = "message received";
+        reply.innerHTML = "Reply from " + currentChat + "<span class='time'>" + getTime() + "</span>";
+
+        chatbox.appendChild(reply);
+        saveChat();
+    }, 1500);
+}
+
+function saveChat() {
+    localStorage.setItem(currentChat, document.getElementById("chatbox").innerHTML);
+}
+
+function toggleDark() {
+    document.body.classList.toggle("dark");
+}
+</script>
+
+</body>
+</html>
